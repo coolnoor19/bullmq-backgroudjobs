@@ -48,3 +48,6 @@ app.get("/tasks", (req, res) => {
 app.listen(5000, () => {
   console.log("Server running on port 5000");
 });
+
+// here we are running two node js processes, one for server another for worker, so we could run them simultaneously, and on server all api calls didn't get blocked by worker process because background job processing is done in worker process and it takes computational time.
+// one job =[] will not share memory between two processes
