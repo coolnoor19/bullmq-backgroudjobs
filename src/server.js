@@ -53,24 +53,69 @@
 // one job =[] will not share memory between two processes
 
 import express from "express";
-import { addJob, getAllJobs } from "./queue.js";
+import {
+  addJob,
+  getAllJobs,
+  getJobById,
+  getJobStats
+} from "./queue.js";
 
 const app = express();
 
 app.use(express.json());
 
 app.post("/tasks", (req, res) => {
-  const job = addJob(req.body);
+//   const job = addJob(req.body);
+const { type, userId, reportName, simulateFailure } = req.body;
 
-  res.status(202).json({
+  if (!type || !userId || !reportName) {
+    return res.status(400).json({
+      message: "type, userId and reportName are required"
+    });
+  }
+
+    const job = addJob({
+    type,
+    userId,
+    reportName,
+    simulateFailure
+  });
+
+    res.status(202).json({
     message: "Task accepted",
     jobId: job.id,
     status: job.status
   });
 });
 
+// Get all jobs
 app.get("/tasks", (req, res) => {
-  res.json(getAllJobs());
+  const { status } = req.query;
+
+  const jobs = getAllJobs(status);
+
+  res.json({
+    total: jobs.length,
+    jobs
+  });
+});
+
+// Get job statistics
+app.get("/tasks/stats", (req, res) => {
+  res.json(getJobStats());
+});
+
+// Get one particular job
+app.get("/tasks/:id", (req, res) => {
+  const job = getJobById(req.params.id);
+
+  if (!job) {
+    return res.status(404).json({
+      message: "Job not found"
+    });
+  }
+
+  res.json(job);
 });
 
 app.listen(5000, () => {

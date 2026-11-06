@@ -33,7 +33,7 @@
 
 // console.log("Worker started...");
 
-import { getNextJob } from "./queue.js";
+import { getNextJob, completeJob , failJob} from "./queue.js";
 import { generateReport } from "./jobs/report.job.js";
 
 let isProcessing = false;
@@ -46,21 +46,26 @@ async function processJob() {
   if (!job) return;
 
   isProcessing = true;
-  job.status = "active";
 
-  console.log("Processing job:", job.id);
+  console.log("\n----------------------------");
+  console.log("JOB PROCESSING STARTED");
+  console.log("Job ID:", job.id);
+  console.log("Status:", job.status);
+  console.log("----------------------------");
+  
+   try {
+    const result = await generateReport(job.data);  // call the genreateReport function with job data   
 
-  try {
-    const result = await generateReport(job.data);
+    completeJob(job.id, result);
 
-    job.status = "completed";
-    job.result = result;
-
-    console.log("Job completed:", job.id);
+    console.log("JOB COMPLETED:", job.id);
+    console.log("Processing time:", job.processingTime, "ms");
 
   } catch (error) {
-    job.status = "failed";
-    job.error = error.message;
+    failJob(job.id, error);
+
+    console.log("JOB FAILED:", job.id);
+    console.log("Error:", error.message);
 
   } finally {
     isProcessing = false;
@@ -68,3 +73,5 @@ async function processJob() {
 }
 
 setInterval(processJob, 500);
+
+console.log("Worker started...");

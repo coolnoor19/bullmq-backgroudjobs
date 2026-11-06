@@ -17,12 +17,16 @@
 export async function generateReport(data) {
   console.log("Generating report:", data.reportName);
 
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  await new Promise(resolve => setTimeout(resolve, 9000));
 
-  console.log("Report generated!");
+  // For our failure experiment
+  if (data.simulateFailure) {
+    throw new Error("Report generation failed!");
+  }
 
   return {
-    status: "generated",
-    reportName: data.reportName
+    reportId: Date.now(),
+    reportName: data.reportName,
+    status: "generated"
   };
 }
