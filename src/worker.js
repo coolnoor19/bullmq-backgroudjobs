@@ -1,16 +1,54 @@
+// import { getNextJob } from "./queue.js";
+// import { generateReport } from "./jobs/report.job.js";
+
+// async function processJob() {
+//   const job = getNextJob();
+
+//   if (!job) {
+//     return;
+//   }
+
+//   console.log("Processing job:", job.id);
+
+//   job.status = "active";
+
+//   try {
+//     const result = await generateReport(job.data);
+
+//     job.status = "completed";
+//     job.result = result;
+
+//     console.log("Job completed:", job.id);
+
+//   } catch (error) {
+//     job.status = "failed";
+//     job.error = error.message;
+
+//     console.log("Job failed:", job.id);
+//   }
+// }
+
+// // Check for jobs every second
+// setInterval(processJob, 1000);
+
+// console.log("Worker started...");
+
 import { getNextJob } from "./queue.js";
 import { generateReport } from "./jobs/report.job.js";
 
+let isProcessing = false;
+
 async function processJob() {
+  if (isProcessing) return;
+
   const job = getNextJob();
 
-  if (!job) {
-    return;
-  }
+  if (!job) return;
+
+  isProcessing = true;
+  job.status = "active";
 
   console.log("Processing job:", job.id);
-
-  job.status = "active";
 
   try {
     const result = await generateReport(job.data);
@@ -24,11 +62,9 @@ async function processJob() {
     job.status = "failed";
     job.error = error.message;
 
-    console.log("Job failed:", job.id);
+  } finally {
+    isProcessing = false;
   }
 }
 
-// Check for jobs every second
-setInterval(processJob, 1000);
-
-console.log("Worker started...");
+setInterval(processJob, 500);

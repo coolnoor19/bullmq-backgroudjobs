@@ -1,15 +1,28 @@
+// export async function generateReport(data) {
+//   console.log("Generating report...");
+//   console.log("Report details:", data);
+
+//   await new Promise(resolve => {
+//     setTimeout(resolve, 5000);
+//   });
+
+//   console.log("Report generated successfully!");
+
+//   return {
+//     reportId: Date.now(),
+//     status: "generated"
+//   };
+// }
+
 export async function generateReport(data) {
-  console.log("Generating report...");
-  console.log("Report details:", data);
+  console.log("Generating report:", data.reportName);
 
-  await new Promise(resolve => {
-    setTimeout(resolve, 5000);
-  });
+  await new Promise(resolve => setTimeout(resolve, 5000));
 
-  console.log("Report generated successfully!");
+  console.log("Report generated!");
 
   return {
-    reportId: Date.now(),
-    status: "generated"
+    status: "generated",
+    reportName: data.reportName
   };
 }
